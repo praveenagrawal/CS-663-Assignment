@@ -108,7 +108,7 @@ toc;
 %% Question 2(c):  Adaptive Histogram Equalization (AHE)
 tic;
 img = imread('../data/barbara.png');
-WindowSize = 100;
+WindowSize = 105;
 EnhancedImg = myAHE(img, WindowSize);
 save '../images/Q2(c)_Barbara' EnhancedImg;
 % INPUT IMAGE
@@ -145,7 +145,8 @@ title('Excessive Noise Amplification', 'FontWeight', 'bold');
 colorbar;
 
 img = imread('../data/TEM.png');
-EnhancedImg = myAHE(img);
+WindowSize = 105;
+EnhancedImg = myAHE(img, WindowSize);
 save '../images/Q2(b)_TEM_Enhanced' EnhancedImg;
 % INPUT IMAGE
 figure;
@@ -178,12 +179,13 @@ colorbar;
 
 
 img = imread('../data/canyon.png');
+WindowSize = 100;
 img_red = img(:,:,1);
 img_green = img(:,:,2);
 img_blue = img(:,:,3);
-EnhancedImg_red = myAHE(img_red);
-EnhancedImg_green = myAHE(img_green);
-EnhancedImg_blue = myAHE(img_blue);
+EnhancedImg_red = myAHE(img_red, WindowSize);
+EnhancedImg_green = myAHE(img_green, WindowSize);
+EnhancedImg_blue = myAHE(img_blue, WindowSize);
 EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
 save '../images/Q2(c)_Canyon_Enhanced' EnhancedImg;
 % INPUT IMAGE
@@ -196,15 +198,22 @@ imshow(EnhancedImg, 'Colormap',myColorScale);
 title('Enhanced Output Image', 'FontWeight', 'bold');
 % low contrast improvement
 WindowSize = 200;   
-EnhancedImg = myAHE(img, WindowSize);
+EnhancedImg_red = myAHE(img_red, WindowSize);
+EnhancedImg_green = myAHE(img_green, WindowSize);
+EnhancedImg_blue = myAHE(img_blue, WindowSize);
+EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
 save '../images/Q2(c)_Canyon_low_contrast_improvement' EnhancedImg;
 % OUTPUT IMAGE
 figure;
 imshow(EnhancedImg, 'Colormap',myColorScale);
 title('Low Contrast Improvement', 'FontWeight', 'bold');
 % Excessive Noise Amplification
+%%
 WindowSize = 50;   
-EnhancedImg = myAHE(img, WindowSize);
+EnhancedImg_red = myAHE(img_red, WindowSize);
+EnhancedImg_green = myAHE(img_green, WindowSize);
+EnhancedImg_blue = myAHE(img_blue, WindowSize);
+EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
 save '../images/Q2(c)_Canyon_Excessive_Noise_Amplification' EnhancedImg;
 % OUTPUT IMAGE
 figure;
@@ -245,7 +254,7 @@ colorbar;
 
 img = imread('../data/TEM.png');
 Threshold = 350;
-EnhancedImg = myCLAHE(img, WindowSize, );
+EnhancedImg = myCLAHE(img, WindowSize, Threshold);
 save '../images/Q2(d)_TEM_Enhanced' EnhancedImg;
 % INPUT IMAGE
 figure;
@@ -259,8 +268,8 @@ title('Enhanced Output Image', 'FontWeight', 'bold');
 colorbar;
 % Half histogram-threshold parameter
 WindowSize = 200;   
-Threshold = 350;
-EnhancedImg = myCLAHE(img, WindowSize);
+Threshold = 175;
+EnhancedImg = myCLAHE(img, WindowSize, Threshold);
 save '../images/Q2(d)_TEM_half_threshold' EnhancedImg;
 % OUTPUT IMAGE
 figure;
@@ -269,14 +278,15 @@ title('Half Threshold', 'FontWeight', 'bold');
 colorbar;
 
 img = imread('../data/canyon.png');
+Threshold = 350;
 img_red = img(:,:,1);
 img_green = img(:,:,2);
 img_blue = img(:,:,3);
-EnhancedImg_red = myCLAHE(img_red);
-EnhancedImg_green = myCLAHE(img_green);
-EnhancedImg_blue = myCLAHE(img_blue);
+EnhancedImg_red = myCLAHE(img_red, WindowSize, Threshold);
+EnhancedImg_green = myCLAHE(img_green, WindowSize, Threshold);
+EnhancedImg_blue = myCLAHE(img_blue, WindowSize, Threshold);
 EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
-save '../images/Q2(b)_Canyon_Enhanced' EnhancedImg;
+save '../images/Q2(d)_Canyon_Enhanced' EnhancedImg;
 % INPUT IMAGE
 figure;
 imshow(img, 'Colormap',myColorScale);
@@ -286,22 +296,15 @@ figure;
 imshow(EnhancedImg, 'Colormap',myColorScale);
 title('Enhanced Output Image', 'FontWeight', 'bold');
 % Half Threshold
-WindowSize = 200;  
 Threshold = 175;
-EnhancedImg = myAHE(img, WindowSize);
-save '../images/Q2(c)_Canyon_low_contrast_improvement' EnhancedImg;
+EnhancedImg_red = myCLAHE(img_red, WindowSize, Threshold);
+EnhancedImg_green = myCLAHE(img_green, WindowSize, Threshold);
+EnhancedImg_blue = myCLAHE(img_blue, WindowSize, Threshold);
+EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
+save '../images/Q2(d)_Canyon_half_threshold' EnhancedImg;
 % OUTPUT IMAGE
 figure;
 imshow(EnhancedImg, 'Colormap',myColorScale);
-title('Low Contrast Improvement', 'FontWeight', 'bold');
-colorbar;
-% Excessive Noise Amplification
-WindowSize = 50;   
-EnhancedImg = myAHE(img, WindowSize);
-save '../images/Q2(c)_Canyon_Excessive_Noise_Amplification' EnhancedImg;
-% OUTPUT IMAGE
-figure;
-imshow(EnhancedImg, 'Colormap',myColorScale);
-title('Excessive Noise Amplification', 'FontWeight', 'bold');
+title('Half Threshold', 'FontWeight', 'bold');
 colorbar;
 toc;

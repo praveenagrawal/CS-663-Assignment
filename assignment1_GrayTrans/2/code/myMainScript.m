@@ -108,7 +108,7 @@ toc;
 %% Question 2(c):  Adaptive Histogram Equalization (AHE)
 tic;
 img = imread('../data/barbara.png');
-WindowSize = 100;
+WindowSize = 105;
 EnhancedImg = myAHE(img, WindowSize);
 save '../images/Q2(c)_Barbara' EnhancedImg;
 % INPUT IMAGE
@@ -145,7 +145,8 @@ title('Excessive Noise Amplification', 'FontWeight', 'bold');
 colorbar;
 
 img = imread('../data/TEM.png');
-EnhancedImg = myAHE(img);
+WindowSize = 105;
+EnhancedImg = myAHE(img, WindowSize);
 save '../images/Q2(b)_TEM_Enhanced' EnhancedImg;
 % INPUT IMAGE
 figure;
@@ -178,6 +179,7 @@ colorbar;
 
 
 img = imread('../data/canyon.png');
+WindowSize = 100;
 img_red = img(:,:,1);
 img_green = img(:,:,2);
 img_blue = img(:,:,3);
@@ -207,7 +209,10 @@ imshow(EnhancedImg, 'Colormap',myColorScale);
 title('Low Contrast Improvement', 'FontWeight', 'bold');
 % Excessive Noise Amplification
 WindowSize = 50;   
-EnhancedImg = myAHE(img, WindowSize);
+EnhancedImg_red = myAHE(img_red, WindowSize);
+EnhancedImg_green = myAHE(img_green, WindowSize);
+EnhancedImg_blue = myAHE(img_blue, WindowSize);
+EnhancedImg = cat(3, EnhancedImg_red, EnhancedImg_green, EnhancedImg_blue);
 save '../images/Q2(c)_Canyon_Excessive_Noise_Amplification' EnhancedImg;
 % OUTPUT IMAGE
 figure;
