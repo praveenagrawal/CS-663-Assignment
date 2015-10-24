@@ -154,7 +154,7 @@ colorbar;
 img = imread('../data/TEM.png');
 WindowSize = 105;
 EnhancedImg = myAHE(img, WindowSize);
-save '../images/Q2(b)_TEM_Enhanced' EnhancedImg;
+save '../images/Q2(c)_TEM_Enhanced' EnhancedImg;
 % INPUT IMAGE
 figure;
 imshow(img, 'Colormap',myColorScale);
