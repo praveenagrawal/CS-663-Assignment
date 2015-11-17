@@ -1,0 +1,272 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>CS 663 : Digital Image Processing : Assignment 5</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-24"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>CS 663 : Digital Image Processing : Assignment 5</h1><!--introduction--><p>Question 1:  Image Denoising using PCA</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Part (a)</a></li><li><a href="#3">Part (b)</a></li><li><a href="#5">Part (c)</a></li><li><a href="#6">Part (c): Comments</a></li></ul></div><h2>Part (a)<a name="1"></a></h2><pre class="codeinput">tic;
+num = 200;
+colorScale = [ (0:1/(num-1):1)' , (0:1/(num-1):1)' , (0:1/(num-1):1)' ];
+imgInput = imread(<span class="string">'../data/barbara256.png'</span>);
+imgInput = double(imgInput);
+[rows, columns] = size(imgInput);
+sigma = 20;
+imgCorrupted = imgInput + randn(size(imgInput))*sigma;
+imgFiltered = myPCADenoising1(imgCorrupted, sigma);
+RMSD_in = sqrt(sum(sum((imgInput-imgCorrupted).^2))/(rows*columns));
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+save <span class="string">'../images/imgFiltered_part_a'</span> <span class="string">imgFiltered</span>;
+
+figure;
+imagesc(imgInput);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Input Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+figure;
+imagesc(imgCorrupted);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Corrupted Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+figure;
+imagesc(imgFiltered);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Filtered Image Part (a)'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+fprintf(<span class="string">'RMSD obtained for noisy image in part (a) is %f \n'</span>, RMSD_in);
+fprintf(<span class="string">'RMSD obtained for denoised image in part (a) is %f \n'</span>, RMSD);
+</pre><pre class="codeoutput">RMSD obtained for noisy image in part (a) is 20.057024 
+RMSD obtained for denoised image in part (a) is 9.888813 
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <h2>Part (b)<a name="3"></a></h2><pre class="codeinput">imgFiltered2 = myPCADenoising2(imgCorrupted, sigma);
+RMSD2 = sqrt(sum(sum((imgInput-imgFiltered2).^2))/(rows*columns));
+save <span class="string">'../images/imgFiltered_part_b'</span> <span class="string">imgFiltered2</span>;
+
+figure;
+imagesc(imgInput);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Input Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+figure;
+imagesc(imgCorrupted);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Corrupted Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+figure;
+imagesc(imgFiltered2);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Filtered Image Part(b)'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+fprintf(<span class="string">'RMSD obtained for noisy image in part (b) is %f \n'</span>, RMSD_in);
+fprintf(<span class="string">'RMSD obtained for denoised image in part (b) is %f \n'</span>, RMSD2);
+</pre><pre class="codeoutput">RMSD obtained for noisy image in part (b) is 20.057024 
+RMSD obtained for denoised image in part (b) is 8.426587 
+</pre><img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <h2>Part (c)<a name="5"></a></h2><pre class="codeinput">[imgIn, imgN, imgOut, mask] = myBilateralFiltering(imgInput, 105, 1.6, 9.5);
+imgOut = double(imgOut);
+RMSD3 = sqrt(sum(sum((imgInput-imgOut).^2))/(rows*columns));
+save <span class="string">'../images/imgFiltered_part_c'</span> <span class="string">imgOut</span>;
+fprintf(<span class="string">'RMSD obtained for noisy image in part (c) is %f \n'</span>, RMSD_in);
+fprintf(<span class="string">'RMSD obtained for denoised image in part (c) is %f \n'</span>, RMSD3);
+
+figure;
+imagesc(imgOut);
+colormap(colorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Filtered Image Part(c) (Bilateral Filter)'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+</pre><pre class="codeoutput">
+rmsd =
+
+    8.5746
+
+RMSD obtained for noisy image in part (c) is 20.057024 
+RMSD obtained for denoised image in part (c) is 8.579446 
+</pre><img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <h2>Part (c): Comments<a name="6"></a></h2><pre class="codeinput"><span class="comment">% We see that the result obtained using the Bilateral Filter is not as</span>
+<span class="comment">% good as the result from the PCA based denoising. The bilaterally filtered</span>
+<span class="comment">% image has a lot of grainy artifact present whereas the other one is</span>
+<span class="comment">% relatively a lot smoother.</span>
+<span class="comment">%</span>
+<span class="comment">% Also, part 2 results are better than part 1 results, as in part 2</span>
+<span class="comment">% updation is done only on the basis of similar patches unlike all the</span>
+<span class="comment">% patches of the image as in part 1.</span>
+
+<span class="comment">% Bilateral filtering algorithm works best for noisy images with constant</span>
+<span class="comment">% regions. The algorithm itself is based on this assumption. The test image</span>
+<span class="comment">% being used here has many different color regions because of the sikn tone</span>
+<span class="comment">% and the shadows; and so denoising is not that effective.</span>
+<span class="comment">%</span>
+<span class="comment">% The main difference between the algorithm for PCA based approach and the</span>
+<span class="comment">% bilateral filter is:</span>
+<span class="comment">% In bilateral filtering, for a given pixel we assign weights for another</span>
+<span class="comment">% pixel based on the dissimilarity between intensities and spatial distance</span>
+<span class="comment">% between the pixels, it does not take into account any parameter of the</span>
+<span class="comment">% underlying noise.</span>
+<span class="comment">% Whereas in PCA based denoising we use the information of noise variance</span>
+<span class="comment">% to estimate the denoised coefficients.</span>
+
+toc;
+</pre><pre class="codeoutput">Elapsed time is 451.659833 seconds.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% CS 663 : Digital Image Processing : Assignment 5
+%
+% Question 1:  Image Denoising using PCA
+%% Part (a)
+tic;
+num = 200;
+colorScale = [ (0:1/(num-1):1)' , (0:1/(num-1):1)' , (0:1/(num-1):1)' ];
+imgInput = imread('../data/barbara256.png');
+imgInput = double(imgInput);
+[rows, columns] = size(imgInput);
+sigma = 20;
+imgCorrupted = imgInput + randn(size(imgInput))*sigma;
+imgFiltered = myPCADenoising1(imgCorrupted, sigma);
+RMSD_in = sqrt(sum(sum((imgInput-imgCorrupted).^2))/(rows*columns));
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+save '../images/imgFiltered_part_a' imgFiltered;
+
+figure;
+imagesc(imgInput);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Input Image', 'FontWeight','bold');
+colorbar;
+
+figure;
+imagesc(imgCorrupted);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Corrupted Image', 'FontWeight','bold');
+colorbar;
+
+figure;
+imagesc(imgFiltered);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Filtered Image Part (a)', 'FontWeight','bold');
+colorbar;
+
+fprintf('RMSD obtained for noisy image in part (a) is %f \n', RMSD_in);
+fprintf('RMSD obtained for denoised image in part (a) is %f \n', RMSD);
+%%
+%% Part (b)
+imgFiltered2 = myPCADenoising2(imgCorrupted, sigma);
+RMSD2 = sqrt(sum(sum((imgInput-imgFiltered2).^2))/(rows*columns));
+save '../images/imgFiltered_part_b' imgFiltered2;
+
+figure;
+imagesc(imgInput);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Input Image', 'FontWeight','bold');
+colorbar;
+
+figure;
+imagesc(imgCorrupted);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Corrupted Image', 'FontWeight','bold');
+colorbar;
+
+figure;
+imagesc(imgFiltered2);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Filtered Image Part(b)', 'FontWeight','bold');
+colorbar;
+
+fprintf('RMSD obtained for noisy image in part (b) is %f \n', RMSD_in);
+fprintf('RMSD obtained for denoised image in part (b) is %f \n', RMSD2);
+%%
+%% Part (c)
+[imgIn, imgN, imgOut, mask] = myBilateralFiltering(imgInput, 105, 1.6, 9.5);
+imgOut = double(imgOut);
+RMSD3 = sqrt(sum(sum((imgInput-imgOut).^2))/(rows*columns));
+save '../images/imgFiltered_part_c' imgOut;
+fprintf('RMSD obtained for noisy image in part (c) is %f \n', RMSD_in);
+fprintf('RMSD obtained for denoised image in part (c) is %f \n', RMSD3);
+
+figure;
+imagesc(imgOut);
+colormap(colorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Filtered Image Part(c) (Bilateral Filter)', 'FontWeight','bold');
+colorbar;
+
+%% Part (c): Comments
+
+% We see that the result obtained using the Bilateral Filter is not as
+% good as the result from the PCA based denoising. The bilaterally filtered
+% image has a lot of grainy artifact present whereas the other one is
+% relatively a lot smoother.
+%
+% Also, part 2 results are better than part 1 results, as in part 2
+% updation is done only on the basis of similar patches unlike all the
+% patches of the image as in part 1.
+
+% Bilateral filtering algorithm works best for noisy images with constant 
+% regions. The algorithm itself is based on this assumption. The test image
+% being used here has many different color regions because of the sikn tone
+% and the shadows; and so denoising is not that effective.
+%
+% The main difference between the algorithm for PCA based approach and the 
+% bilateral filter is:
+% In bilateral filtering, for a given pixel we assign weights for another 
+% pixel based on the dissimilarity between intensities and spatial distance 
+% between the pixels, it does not take into account any parameter of the 
+% underlying noise. 
+% Whereas in PCA based denoising we use the information of noise variance 
+% to estimate the denoised coefficients.
+
+toc;
+
+##### SOURCE END #####
+--></body></html>
