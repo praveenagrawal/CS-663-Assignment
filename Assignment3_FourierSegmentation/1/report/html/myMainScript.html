@@ -1,0 +1,315 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>CS 663 : Digital Image Processing : Assignment 3</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-09-14"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>CS 663 : Digital Image Processing : Assignment 3</h1><p>Question 1: Fourier Analysis</p><pre class="codeinput">tic;
+num = 200;
+ColorScale = [ [0:1/(num-1):1]' , [0:1/(num-1):1]' , [0:1/(num-1):1]' ];
+imgInput = load(<span class="string">'../data/boat.mat'</span>);
+imgInput = double(imgInput.imageOrig/255);
+[rows, columns] = size(imgInput);
+imgCorrupted = imgInput+(0.1*(max(max(imgInput)))-(min(min(imgInput))))*randn(size(imgInput));
+D0=100;
+n=2;
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, D0);
+save <span class="string">'../images/Q1_filtered_image'</span> <span class="string">imgFiltered</span>;
+save <span class="string">'../images/Q1_butterworth_filter'</span> <span class="string">filter</span>;
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+figure;
+imagesc(filter);
+colormap(ColorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]);<span class="comment">% axis tight;</span>
+title(<span class="string">'Butterworth Filter in frequency domain'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+
+figure;
+subplot(1,3,1), imagesc(imgInput);
+title(<span class="string">'Input Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+colormap(ColorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]); axis <span class="string">tight</span>;
+axis <span class="string">on</span>;
+subplot(1,3,2), imagesc(imgCorrupted);
+title(<span class="string">'Corrupted Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+colormap(ColorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]); axis <span class="string">tight</span>;
+axis <span class="string">on</span>;
+subplot(1,3,3), imagesc(imgFiltered);
+title(<span class="string">'Filtered Image'</span>, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+colorbar;
+colormap(ColorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]); axis <span class="string">tight</span>;
+axis <span class="string">on</span>;
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <pre class="codeinput"><span class="comment">%Optimal parameter found for D0</span>
+D0
+</pre><pre class="codeoutput">
+D0 =
+
+   100
+
+</pre><pre class="codeinput"><span class="comment">%RMSD value found for the optimal value of RMSD</span>
+RMSD
+</pre><pre class="codeoutput">
+RMSD =
+
+    0.0441
+
+</pre><pre class="codeinput"><span class="comment">%RMSD for 0.95*D0</span>
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, 0.95*D0);
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns))
+</pre><pre class="codeoutput">
+RMSD =
+
+    0.0442
+
+</pre><pre class="codeinput"><span class="comment">%RMSD for 1.05*D0</span>
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, 0.95*D0);
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns))
+</pre><pre class="codeoutput">
+RMSD =
+
+    0.0442
+
+</pre><pre class="codeinput"><span class="comment">%Circular Mask</span>
+percent = [88,91,94,97,99]; <span class="comment">%Percentage of energy</span>
+R = zeros(size(percent));   <span class="comment">%The radii corresponding to the given percentage values</span>
+RMSD = zeros(size(percent));
+
+
+<span class="keyword">for</span> i = 1:length(percent)
+    R(i) = findR(imgCorrupted, percent(i));
+    imgFiltered = myIdealLowPassFilter(imgCorrupted, R(i));
+    RMSD(i) = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+    figure;
+    imagesc(imgFiltered);
+    t = sprintf(<span class="string">'Radius %d'</span>,R(i));
+    title(t, <span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+    colorbar;
+    colormap(ColorScale); colormap <span class="string">gray</span>; daspect ([2 2 2]); axis <span class="string">tight</span>;
+    axis <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <p>R and RMSD for 88% of total energy</p><pre class="codeinput">R(1)
+RMSD(1)
+</pre><pre class="codeoutput">
+ans =
+
+     2
+
+
+ans =
+
+    0.1422
+
+</pre><p>R and RMSD for 91% of total energy</p><pre class="codeinput">R(2)
+RMSD(2)
+</pre><pre class="codeoutput">
+ans =
+
+     4
+
+
+ans =
+
+    0.1282
+
+</pre><p>R and RMSD for 94% of total energy</p><pre class="codeinput">R(3)
+RMSD(3)
+</pre><pre class="codeoutput">
+ans =
+
+    15
+
+
+ans =
+
+    0.0894
+
+</pre><p>R and RMSD for 97% of total energy</p><pre class="codeinput">R(4)
+RMSD(4)
+</pre><pre class="codeoutput">
+ans =
+
+   123
+
+
+ans =
+
+    0.0520
+
+</pre><p>R and RMSD for 99% of total energy</p><pre class="codeinput">R(5)
+RMSD(5)
+toc;
+</pre><pre class="codeoutput">
+ans =
+
+   243
+
+
+ans =
+
+    0.0838
+
+Elapsed time is 13.112954 seconds.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% CS 663 : Digital Image Processing : Assignment 3
+% Question 1: Fourier Analysis
+tic;
+num = 200;
+ColorScale = [ [0:1/(num-1):1]' , [0:1/(num-1):1]' , [0:1/(num-1):1]' ];
+imgInput = load('../data/boat.mat');
+imgInput = double(imgInput.imageOrig/255);
+[rows, columns] = size(imgInput);
+imgCorrupted = imgInput+(0.1*(max(max(imgInput)))-(min(min(imgInput))))*randn(size(imgInput));
+D0=100;
+n=2;
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, D0);
+save '../images/Q1_filtered_image' imgFiltered;
+save '../images/Q1_butterworth_filter' filter;
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+figure;
+imagesc(filter);
+colormap(ColorScale); colormap gray; daspect ([2 2 2]);% axis tight;
+title('Butterworth Filter in frequency domain', 'FontWeight','bold');
+colorbar;
+
+figure;
+subplot(1,3,1), imagesc(imgInput);
+title('Input Image', 'FontWeight','bold');
+colorbar;
+colormap(ColorScale); colormap gray; daspect ([2 2 2]); axis tight;
+axis on;
+subplot(1,3,2), imagesc(imgCorrupted);
+title('Corrupted Image', 'FontWeight','bold');
+colorbar;
+colormap(ColorScale); colormap gray; daspect ([2 2 2]); axis tight;
+axis on;
+subplot(1,3,3), imagesc(imgFiltered);
+title('Filtered Image', 'FontWeight','bold');
+colorbar;
+colormap(ColorScale); colormap gray; daspect ([2 2 2]); axis tight;
+axis on;
+%%
+%Optimal parameter found for D0
+D0
+%%
+%RMSD value found for the optimal value of RMSD
+RMSD
+%%
+%RMSD for 0.95*D0
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, 0.95*D0);
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns))
+%%
+%RMSD for 1.05*D0
+[imgFiltered, filter] =  myButterworthFiltering(imgCorrupted, n, 0.95*D0);
+imgFiltered = real(imgFiltered);
+RMSD = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns))
+%%
+%Circular Mask
+percent = [88,91,94,97,99]; %Percentage of energy
+R = zeros(size(percent));   %The radii corresponding to the given percentage values
+RMSD = zeros(size(percent));
+
+
+for i = 1:length(percent)
+    R(i) = findR(imgCorrupted, percent(i));
+    imgFiltered = myIdealLowPassFilter(imgCorrupted, R(i));
+    RMSD(i) = sqrt(sum(sum((imgInput-imgFiltered).^2))/(rows*columns));
+    figure;
+    imagesc(imgFiltered);
+    t = sprintf('Radius %d',R(i));
+    title(t, 'FontWeight','bold');
+    colorbar;
+    colormap(ColorScale); colormap gray; daspect ([2 2 2]); axis tight;
+    axis on;
+end
+%%
+% R and RMSD for 88% of total energy
+R(1)
+RMSD(1)
+%%
+% R and RMSD for 91% of total energy
+R(2)
+RMSD(2)
+%%
+% R and RMSD for 94% of total energy
+R(3)
+RMSD(3)
+%%
+% R and RMSD for 97% of total energy
+R(4)
+RMSD(4)
+%%
+% R and RMSD for 99% of total energy
+R(5)
+RMSD(5)
+toc;
+
+##### SOURCE END #####
+--></body></html>
